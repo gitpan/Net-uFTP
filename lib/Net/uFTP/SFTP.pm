@@ -2,7 +2,7 @@ package Net::uFTP::SFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.1;
+$VERSION = 0.11;
 #--------------
 
 use warnings;
@@ -39,7 +39,7 @@ sub new {
 	$self->host($host);
 	
 	$self->ssh(Net::SSH2->new());
-	$self->ssh()->debug($self->debug());
+	$self->ssh()->debug($self->debug() ? 1 : 0);
 	$self->ssh()->connect($host);
 	$self->ssh()->auth(username => $self->user(), password => $self->password());
 	$self->sftp($self->ssh()->sftp());
@@ -66,9 +66,9 @@ sub pwd {
 sub ls {
 	my ($self, $path) = @_;
 	
-	$path = $self->pwd() unless defined $path;
-	my $root = ($path =~ /^\//o) ? $self->root() : $self->_cwd();
-	$root = File::Spec->catfile($root,$path);
+	my $_path = defined $path ? $path : $self->pwd();
+	my $root = ($_path =~ /^\//o) ? $self->root() : $self->_cwd();
+	$root = File::Spec->catfile($root,$_path);
 	my $r = $self->root();
 	(my $remote = $root) =~ s/^$r//;
 	
@@ -78,6 +78,7 @@ sub ls {
 			next if $file->{name} =~ /^\./;
 			push @files, $file->{name};
 		}
+		return @files unless defined $path;
 		return map { File::Spec->catfile($path,$_) } @files;
 	}else{
 		return $remote if $self->sftp()->open($root);
@@ -134,7 +135,7 @@ sub mdtm {
 	my ($self, $remote) = @_;
 	return unless defined $remote;
 	my $root = ($remote =~ /^\//o) ? $self->root() : $self->_cwd();
-		$remote = File::Spec->catfile($root,$remote);
+	$remote = File::Spec->catfile($root,$remote);
 	return unless $self->sftp()->open($remote);
 	return ($self->sftp()->stat($remote))->{mtime}; 
 }
@@ -159,7 +160,6 @@ sub put {
 				}, $local);
 				
 		my $base = basename($local);
-		#$root = dirname($root);
 		$self->mkdir(File::Spec->catfile($remote,$_),1) for sort map { s/^$local/$base/; $_ } @dirs;
 		for(@files){
 			(my $r = $_) =~ s/^$local/$base/;
@@ -191,14 +191,13 @@ sub get {
 	
 	if(my $dir = $self->sftp()->opendir($src)){
 		mkpath $local;
+		return unless $recurse;
 		while(my $file = $dir->read()){
 			next if $file->{name} =~ /^\./o;
 			my $this = File::Spec->catfile($src, $file->{name});
 			my $dst = File::Spec->catfile($local, $file->{name});
-			if($recurse and $self->is_dir($this)){
+			if($self->is_dir($this)){
 				$self->get(File::Spec->catfile($remote, $file->{name}), $dst, 1);
-			}elsif($self->is_dir($this)){
-				mkdir $dst;
 			}else{
 				$self->ssh()->scp_get(quotemeta($this), $dst);
 			}
