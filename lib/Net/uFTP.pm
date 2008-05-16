@@ -2,7 +2,7 @@ package Net::uFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.11;
+$VERSION = 0.111;
 #--------------
 
 use warnings;
@@ -63,10 +63,7 @@ Net::uFTP - Universal interface for FTP-like modules (FTP, SFTP, SCP), in most c
 
     use Net::uFTP;
 
-    my $ftp = Net::uFTP->new('rswsystems.pl', type => 'FTP', debug => 1);
-    $ftp->login('aa29245', 'wtyd');
-
-    $ftp = Net::uFTP->new('some.host.name', type => 'FTP', debug => 1)
+    my $ftp = Net::uFTP->new('some.host.name', type => 'FTP', debug => 1)
       or die "Cannot connect to some.host.name: $@";
 
     $ftp->login('mylogin','mysecret')
