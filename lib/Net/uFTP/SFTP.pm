@@ -2,7 +2,7 @@ package Net::uFTP::SFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.112;
+$VERSION = 0.12;
 #--------------
 
 use warnings;
@@ -41,7 +41,8 @@ sub new {
 	$self->ssh(Net::SSH2->new());
 	$self->ssh()->debug($self->debug() ? 1 : 0);
 	$self->ssh()->connect($host);
-	$self->ssh()->auth(username => $self->user(), password => $self->password());
+	return unless $self->ssh()->auth_password($self->user(), $self->password());
+	#$self->ssh()->auth(username => $self->user(), password => $self->password());
 	$self->sftp($self->ssh()->sftp());
 	$self->root($self->sftp()->realpath('.'));
 	$self->cwd($self->root());

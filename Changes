@@ -1,6 +1,9 @@
 Revision history for Perl extension Net::uFTP.
 
-0.112  Thu Jun 18 12:54:11 CEST 2008
+0.12  Thu Jun 18 23:54:11 CEST 2008
+	- Changes in authentication method in SFTP environment.
+
+0.112  Wed Jun 18 12:54:11 CEST 2008
 	- Fixed little bug in pwd() in SFTP environment.
 	- Added method change_root() in SFTP environment.
 
