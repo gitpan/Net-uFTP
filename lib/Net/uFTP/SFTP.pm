@@ -2,7 +2,7 @@ package Net::uFTP::SFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.111;
+$VERSION = 0.112;
 #--------------
 
 use warnings;
@@ -37,7 +37,7 @@ sub new {
 
 	$self = bless \%params, $self;	
 	$self->host($host);
-	
+
 	$self->ssh(Net::SSH2->new());
 	$self->ssh()->debug($self->debug() ? 1 : 0);
 	$self->ssh()->connect($host);
@@ -45,8 +45,17 @@ sub new {
 	$self->sftp($self->ssh()->sftp());
 	$self->root($self->sftp()->realpath('.'));
 	$self->cwd($self->root());
+	$self->_cwd('/');
 
 	return $self;
+}
+#======================================================================
+sub change_root {
+	my ($self, $root) = @_;
+	$self->root($root);
+	$self->cwd($root);
+	$self->_cwd('/');
+	return $root;
 }
 #======================================================================
 sub cwd {
@@ -60,7 +69,7 @@ sub pwd {
 	my ($self) = @_;
 	my $root = $self->root();
 	(my $cwd = $self->_cwd()) =~ s/^$root//;
-	return $cwd;
+	return ($cwd and $cwd != 0) ? $cwd : '/';
 }
 #======================================================================
 sub ls {

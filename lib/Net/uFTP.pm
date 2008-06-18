@@ -2,7 +2,7 @@ package Net::uFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.111;
+$VERSION = 0.112;
 #--------------
 
 use warnings;
@@ -85,7 +85,7 @@ Net::uFTP - Universal interface for FTP-like modules (FTP, SFTP, SCP), in most c
 
 This module provides common interface (B<Net::FTP compatible>) to 
 popular FTP-like protocols (for now: FTP, SFTP, SCP). Flexibility of 
-this module allows to add plugins to supprot othre protocols 
+this module allows to add plugins to support other protocols 
 (suggestions and plugins are welcome ;)
 
 Currently C<Net::uFTP> was successfuly tested for compatibility with 
@@ -292,6 +292,10 @@ Returns true if REMOTE is a directory.
 =item is_file ( REMOTE )
 
 Returns true if REMOTE is a regular file.
+
+=item change_root ( DIR )
+
+Change root directory of current user. Only available in SFTP environment.
 
 =back
 
