@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::uFTP.
 
+0.14  Fri Jun 27 20:35:15 CEST 2008
+	- Flag 'blocking' is set to 1 by default.
+
 0.13  Fri Jun 27 20:22:30 CEST 2008
 	- Fixed recursive upload.
 

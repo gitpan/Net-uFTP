@@ -2,7 +2,7 @@ package Net::uFTP::FTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.13;
+$VERSION = 0.14;
 #--------------
 
 use warnings;
