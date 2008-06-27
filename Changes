@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::uFTP.
 
+0.13  Fri Jun 27 20:22:30 CEST 2008
+	- Fixed recursive upload.
+
 0.12  Thu Jun 18 23:54:11 CEST 2008
 	- Changes in authentication method in SFTP environment.
 

@@ -2,7 +2,7 @@ package Net::uFTP::SFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.12;
+$VERSION = 0.13;
 #--------------
 
 use warnings;
@@ -70,7 +70,7 @@ sub pwd {
 	my ($self) = @_;
 	my $root = $self->root();
 	(my $cwd = $self->_cwd()) =~ s/^$root//;
-	return ($cwd and $cwd != 0) ? $cwd : '/';
+	return ($cwd and $cwd ne 0) ? $cwd : '/';
 }
 #======================================================================
 sub ls {
@@ -158,6 +158,7 @@ sub put {
 	my $root = ($remote =~ /^\//o) ? $self->root() : $self->_cwd();
 	$root = File::Spec->catfile($root,$remote);
 	$root = File::Spec->catfile($root, basename($local)) if $self->sftp()->opendir($root);
+	$root = File::Spec->canonpath($root);
 	
 	if(not $recurse and -d $local){
 		$self->mkdir($root);
@@ -168,12 +169,14 @@ sub put {
 					if(-d $File::Find::name){ push @dirs, $File::Find::name; }
 					elsif(-f $File::Find::name){ push @files, $File::Find::name; }
 				}, $local);
-				
-		my $base = basename($local);
-		$self->mkdir(File::Spec->catfile($remote,$_),1) for sort map { s/^$local/$base/; $_ } @dirs;
+	
+		@dirs  = map { s/^$local//o; $_} @dirs;	
+		$self->mkdir($root, 1);
+		$self->mkdir(File::Spec->catfile($root,$_),1) for @dirs;
+		
 		for(@files){
-			(my $r = $_) =~ s/^$local/$base/;
-			$self->ssh()->scp_put($_, quotemeta(File::Spec->catfile($root,$r)));
+			(my $r = $_) =~ s/^$local//o;
+			$self->ssh()->scp_put($_, quotemeta(File::Spec->canonpath(File::Spec->catfile($root,$r))));
 		}		
 	}elsif(-f $local){
 		$self->mkdir(dirname($remote));
