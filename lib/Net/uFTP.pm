@@ -2,15 +2,16 @@ package Net::uFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.14;
+$VERSION = 0.15;
 #--------------
 
 use warnings;
 use strict;
 use Carp;
 use UNIVERSAL::require;
-#======================================================================
-my %SELF = map { $_ => 1 } qw(object host type user password debug);
+use base qw(Class::Accessor::Fast::XS);
+#----------------------------------------------------------------------
+__PACKAGE__->mk_accessors(qw(object host type user password debug port));
 #======================================================================
 sub new {
 	my ($self, $host, %params) = (shift, shift, @_);
@@ -18,6 +19,7 @@ sub new {
 	$params{host} = $host;
 	$self = bless \%params, $self;
 	
+	# little standarization :-)	
 	$self->type($self->type() or 'Net::uFTP::FTP');
 	my $type = $self->type() =~ /^Net::uFTP/ ? $self->type() : 'Net::uFTP::'.$self->type();
 	$type =~ s/SCP$/SFTP/;
@@ -32,20 +34,18 @@ sub login {
 	my ($self, $user, $passwd) = @_;
 	
 	my $type = $self->type();
-	$self->object($type->new($self->host, user => $user, password => $passwd, debug => $self->debug));
+	$self->object($type->new($self->host, port => $self->port, user => $user, password => $passwd, debug => $self->debug));
+	return 1 if $self->object;
+	return;
 }
 #======================================================================
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my ($method) = $AUTOLOAD =~ /::([^:]+)$/o;
-	
+
+	return if $method eq 'DESTROY';	
+
 	my $self = shift;
-	if($method eq 'DESTROY'){ return; }
-	elsif($SELF{$method}){
-		$self->{$method} = $_[0] if defined $_[0];
-		return $self->{$method};
-	}
-	
 	croak(qq/Unsupported method "$method"/) unless $self->object()->can($method);
 	
 	return $self->object()->$method(@_);
@@ -63,11 +63,10 @@ Net::uFTP - Universal interface for FTP-like modules (FTP, SFTP, SCP), in most c
 
     use Net::uFTP;
 
-    my $ftp = Net::uFTP->new('some.host.name', type => 'FTP', debug => 1)
-      or die "Cannot connect to some.host.name: $@";
+    my $ftp = Net::uFTP->new('some.host.name', type => 'FTP', debug => 1);
 
     $ftp->login('mylogin','mysecret')
-      or die 'Cannot login ', $ftp->message;
+      or die 'Incorrect password or login!';
 
     $ftp->cwd("/pub")
       or die "Cannot change working directory ", $ftp->message;
@@ -132,6 +131,8 @@ B<debug> - debug level (see the debug method in L<Net::Cmd>)
 
 B<type> - type of connection. Possible values: FTP, SFTP, SCP. Default 
 to FTP.
+
+B<port> - the port number to connect to on the remote machine.
 
 If the constructor fails undef will be returned and an error message will
 be in $@

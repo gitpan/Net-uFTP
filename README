@@ -5,14 +5,10 @@ NAME
 SYNOPSIS
         use Net::uFTP;
 
-        my $ftp = Net::uFTP->new('rswsystems.pl', type => 'FTP', debug => 1);
-        $ftp->login('aa29245', 'wtyd');
-
-        $ftp = Net::uFTP->new('some.host.name', type => 'FTP', debug => 1)
-          or die "Cannot connect to some.host.name: $@";
+        my $ftp = Net::uFTP->new('some.host.name', type => 'FTP', debug => 1);
 
         $ftp->login('mylogin','mysecret')
-          or die 'Cannot login ', $ftp->message;
+          or die 'Incorrect password or login!';
 
         $ftp->cwd("/pub")
           or die "Cannot change working directory ", $ftp->message;
@@ -29,7 +25,7 @@ SYNOPSIS
 DESCRIPTION
     This module provides common interface (Net::FTP compatible) to popular
     FTP-like protocols (for now: FTP, SFTP, SCP). Flexibility of this module
-    allows to add plugins to supprot othre protocols (suggestions and
+    allows to add plugins to support other protocols (suggestions and
     plugins are welcome ;)
 
     Currently "Net::uFTP" was successfuly tested for compatibility with
@@ -69,6 +65,8 @@ CONSTRUCTOR
 
         type - type of connection. Possible values: FTP, SFTP, SCP. Default
         to FTP.
+
+        port - the port number to connect to on the remote machine.
 
         If the constructor fails undef will be returned and an error message
         will be in $@
@@ -202,6 +200,10 @@ METHODS
 
     is_file ( REMOTE )
         Returns true if REMOTE is a regular file.
+
+    change_root ( DIR )
+        Change root directory of current user. Only available in SFTP
+        environment.
 
 TODO
     Add support for other methods from Net::FTP.

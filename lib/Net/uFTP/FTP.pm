@@ -2,7 +2,7 @@ package Net::uFTP::FTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.14;
+$VERSION = 0.15;
 #--------------
 
 use warnings;
@@ -13,19 +13,18 @@ use File::Path qw(mkpath);
 use Cwd qw(getcwd);
 use Net::FTP::AutoReconnect;
 #======================================================================
-my %SELF = map { $_ => 1 } qw(ftp host type user password debug);
+use base qw(Class::Accessor::Fast::XS);
+#----------------------------------------------------------------------
+__PACKAGE__->mk_accessors(qw(ftp host type user password debug));
 #======================================================================
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my ($method) = $AUTOLOAD =~ /::([^:]+)$/o;
+
+	return if $method eq 'DESTROY';	
 	
 	my $self = shift;
-	if($method eq 'DESTROY'){ return; }
-	elsif($SELF{$method}){
-		$self->{$method} = $_[0] if defined $_[0];
-		return $self->{$method};
-	}
-	#print "$self $method\n";
+	
 	croak(qq/Unsupported method "$method"/) unless $self->ftp()->can($method);
 	
 	return $self->ftp()->$method(@_);
@@ -36,8 +35,8 @@ sub new {
 	
 	$self = bless \%params, $self;
 
-	$self->ftp(Net::FTP::AutoReconnect->new($host, Debug => $self->debug()));
-	$self->ftp()->login($self->user(), $self->password());
+	$self->ftp(Net::FTP::AutoReconnect->new($host, Port => $params{port}, Debug => $self->debug, ));
+	$self->ftp()->login($self->user(), $self->password()) or return;
 	return $self;
 }
 #======================================================================

@@ -17,6 +17,7 @@ WriteMakefile(
         'Net::FTP::AutoReconnect'	=> 0,
 		'Net::SSH2'					=> 0,
 		'File::Stat::ModeString'	=> 0,
+		'Class::Accessor::Fast::XS'	=> 0,
     },
 	#) : ()),
 );

@@ -2,7 +2,7 @@ package Net::uFTP::SFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.14;
+$VERSION = 0.15;
 #--------------
 
 use warnings;
@@ -16,33 +16,21 @@ use File::Find;
 use File::Path qw(mkpath);
 use Cwd qw(getcwd);
 #======================================================================
-my %SELF = map { $_ => 1 } qw(ssh sftp host user password debug root _cwd);
-#======================================================================
-sub AUTOLOAD {
-	our $AUTOLOAD;
-	my ($method) = $AUTOLOAD =~ /::([^:]+)$/o;
-	
-	my $self = shift;
-	if($method eq 'DESTROY'){ return; }
-	elsif($SELF{$method}){
-		$self->{$method} = $_[0] if defined $_[0];
-		return $self->{$method};
-	}
-	
-	croak(qq/Unsupported method "$method"!/);
-}
+use base qw(Class::Accessor::Fast::XS);
+#----------------------------------------------------------------------
+__PACKAGE__->mk_accessors(qw(ssh sftp host user password debug root _cwd port));
 #======================================================================
 sub new {
 	my ($self, $host, %params) = (shift, shift, @_);
-
+	
 	$self = bless \%params, $self;	
 	$self->host($host);
-
 	$self->ssh(Net::SSH2->new());
 	$self->ssh()->blocking( 1 );
 	$self->ssh()->debug($self->debug() ? 1 : 0);
-	$self->ssh()->connect($host);
-	return unless $self->ssh()->auth_password($self->user(), $self->password());
+	#$self->ssh()->connect($host . q/:/ . $params{port});
+	$self->ssh()->connect($host, $self->port) or return;
+	$self->ssh()->auth_password($self->user(), $self->password()) or return;
 	#$self->ssh()->auth(username => $self->user(), password => $self->password());
 	$self->sftp($self->ssh()->sftp());
 	$self->root($self->sftp()->realpath('.'));
@@ -284,8 +272,6 @@ sub cdup {
 sub binary { }
 #======================================================================
 sub ascii { }
-#======================================================================
-sub port { }
 #======================================================================
 sub pasv { }
 #======================================================================
