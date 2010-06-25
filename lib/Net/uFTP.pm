@@ -2,7 +2,7 @@ package Net::uFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.15;
+$VERSION = 0.16;
 #--------------
 
 use warnings;
@@ -21,13 +21,18 @@ sub new {
 	
 	# little standarization :-)	
 	$self->type($self->type() or 'Net::uFTP::FTP');
-	my $type = $self->type() =~ /^Net::uFTP/ ? $self->type() : 'Net::uFTP::'.$self->type();
+	my $type = $self->type() =~ /^Net::uFTP/o ? $self->type() : 'Net::uFTP::'.$self->type();
 	$type =~ s/SCP$/SFTP/;
 	
 	$type->require or return;
 	$self->type($type);
 
 	return $self;
+}
+#======================================================================
+sub get {
+    my $self = shift;
+    return $self->object()->get(@_);
 }
 #======================================================================
 sub login {
@@ -315,6 +320,10 @@ also be useful if this script was run with the extra options C<debug => 1>
 passed to the constructor, and the output sent with the bug report. If you
 cannot include a small script then please include a debug trace from a
 run of your program which does yield the problem.
+
+=head1 THANKS
+
+Ryan Gorsuch for reaporting a bug as well as supplying relevant patch.
 
 =head1 AUTHOR
 

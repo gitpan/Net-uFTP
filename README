@@ -219,6 +219,9 @@ REPORTING BUGS
     report. If you cannot include a small script then please include a debug
     trace from a run of your program which does yield the problem.
 
+THANKS
+    Ryan Gorsuch for reaporting a bug as well as supplying relevant patch.
+
 AUTHOR
     Strzelecki £ukasz <strzelec@rswsystems.com>
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::uFTP.
 
+0.16 Fri, 25 Jun 2010 23:55:38 +0200
+	- Fixed bug in get method. Thanks to Ryan Gorsuch.
+
+0.15  Fri Dec 26 21:38:11 CEST 2008
+	- Some fixes.
+
 0.14  Fri Jun 27 20:35:15 CEST 2008
 	- Flag 'blocking' is set to 1 by default.
 
