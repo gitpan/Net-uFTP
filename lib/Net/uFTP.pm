@@ -2,7 +2,7 @@ package Net::uFTP;
 
 use vars qw($VERSION);
 
-$VERSION = 0.16;
+$VERSION = 0.161;
 #--------------
 
 use warnings;
@@ -327,7 +327,7 @@ Ryan Gorsuch for reaporting a bug as well as supplying relevant patch.
 
 =head1 AUTHOR
 
-Strzelecki £ukasz <strzelec@rswsystems.com>
+Strzelecki £ukasz <lukasz@strzeleccy.eu>
 
 =head1 SEE ALSO
 

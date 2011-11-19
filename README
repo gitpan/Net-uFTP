@@ -223,7 +223,7 @@ THANKS
     Ryan Gorsuch for reaporting a bug as well as supplying relevant patch.
 
 AUTHOR
-    Strzelecki £ukasz <strzelec@rswsystems.com>
+    Strzelecki £ukasz <lukasz@strzeleccy.eu>
 
 SEE ALSO
     Net::xFTP Net::FTP Net::SSH2
